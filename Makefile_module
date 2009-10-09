@@ -1,0 +1,77 @@
+# Makefile for simple modules in the Oscar Framework.
+# Copyright (C) 2008 Supercomputing Systems AG
+# 
+# This library is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Lesser General Public License as published by the Free
+# Software Foundation; either version 2.1 of the License, or (at your option)
+# any later version.
+# 
+# This library is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
+# details.
+# 
+# You should have received a copy of the GNU Lesser General Public License along
+# with this library; if not, write to the Free Software Foundation, Inc., 51
+# Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
+# Disable make's built-in rules.
+MAKE += -RL --no-print-directory
+SHELL := $(shell which bash) -e -o pipefail
+
+# This includes the framework configuration.
+ROOT_PATH := $(dir $(shell readlink $(lastword $(MAKEFILE_LIST))))
+
+# Generic flags for the C compiler.
+CFLAGS := -c -std=gnu99 -Wall $(if $(ROOT_PATH), -I$(ROOT_PATH)include) $(if $(ROOT_PATH), -I$(ROOT_PATH)oscar)
+
+# Host-Compiler executables and flags.
+CC_host_ := gcc $(CFLAGS) -fgnu89-inline -DOSC_HOST
+CC_host := $(CC_host_) -O2
+CC_host_dbg := $(CC_host_) -g
+
+# Cross-Compiler executables and flags.
+CC_target_ := bfin-uclinux-gcc $(CFLAGS) -DOSC_TARGET
+CC_target := $(CC_target_) -O2
+CC_target_dbg := $(CC_target_) -ggdb3
+
+# Assembler for the host and the target.
+AS_host := as
+AS_target := bfin-uclinux-as
+
+# Listings of source files for the different modes.
+SOURCES := $(filter-out %_host.c %_target.c, $(wildcard *.c))
+SOURCES_host := $(SOURCES) $(wildcard *_host.c)
+SOURCES_target := $(SOURCES) $(wildcard *_target.c)
+
+# Modes to compile this module in.
+MODES := host target
+MODES += $(addsuffix _dbg, $(MODES))
+
+# Helper function to access stacked, mode-dependent variables.
+varnames = $(filter $(.VARIABLES), $(foreach i, $(shell seq 1 $(words $(subst _, , $(1)))), $(subst $() ,_,$(wordlist 1, $i, $(subst _, , $(1))))))
+firstvar = $($(lastword $(call varnames, $(1))))
+allvars = $(foreach i, $(call varnames, $(1)), $($i))
+
+.PHONY: all $(MODES) clean
+all: $(MODES)
+
+# Including depency files and optional local Makefile.
+-include Makefile.local build/*.d
+
+#Defining and expanding the build targets.
+define build_rules
+$(1): $(patsubst %.c, build/%_$(1).o, $(patsubst %.asm, build/%_$(1).o, $(call firstvar, SOURCES_$(1))))
+build/%_$(1).o: %.c $(filter-out %.d, $(MAKEFILE_LIST))
+	@ mkdir -p $$(dir $$@)
+	$$(call firstvar, CC_$(1)) -MD $$< -o $$@
+	@ grep -oE '[^ \\]+' < $$(@:.o=.d) | sed -r '/:$$$$/d; s|^.*$$$$|$$@: \0\n\0:|' > $$(@:.o=.d~) && mv -f $$(@:.o=.d){~,}
+build/%_$(1).o: %.asm $(filter-out %.d, $(MAKEFILE_LIST))
+	@ mkdir -p $$(dir $$@)
+	$$(call firstvar, AS_$(1)) $$< -o $$@
+endef
+$(foreach i, $(MODES), $(eval $(call build_rules,$(i))))
+
+# Cleans the module.
+clean:
+	rm -rf build

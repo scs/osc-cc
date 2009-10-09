@@ -1,0 +1,19 @@
+CONFIGS='PRIVATE_FRAMEWORK FRAMEWORK_PATH'
+
+CONFIG_PRIVATE_FRAMEWORK() {
+	enabled() { true; }
+	prompt() { echo 'Is the Oscar Framework already in the folder ./oscar? (y/n)'; }
+	default() { echo 'n'; }
+	check() { grep -xqE 'y|n'; }
+	
+	[ "$1" ] && "$1"
+}
+
+CONFIG_FRAMEWORK_PATH() {
+	enabled() { [ "$CONFIG_PRIVATE_FRAMEWORK" == 'n' ]; }
+	prompt() { echo 'Enter the path to the Oscar Framework.'; }
+	default() { echo '../oscar'; }
+	check() { grep -xqE '.+'; }
+	
+	[ "$1" ] && "$1"
+}

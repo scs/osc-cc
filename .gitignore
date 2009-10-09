@@ -1,0 +1,7 @@
+# Ignore generated files
+*~
+build
+
+# Ignore files used by the build system
+/oscar
+/.config
