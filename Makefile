@@ -34,7 +34,6 @@ AR_host := ar -rcs
 AR_target := bfin-uclinux-ar -rcs
 
 # Modules to compile
-#MODULES := Classification/Labeling
 MODULES := $(shell find . -mindepth 2 -name Makefile -exec  dirname {} \;)
 
 # Modes to compile this module in.
