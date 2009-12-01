@@ -95,7 +95,7 @@ void blob(struct OSC_PICTURE *pPic, int x, int y, int size, uint32 color)
 	}
 }
 
-void Occ_ov_text(struct OSC_PICTURE *pPic, int x, int y, int size, char *text, uint32 col_fg, uint32 col_bg) 
+void ov_text(struct OSC_PICTURE *pPic, int x, int y, int size, char *text, uint32 col_fg, uint32 col_bg) 
 {
 	int i;
 	int a,b;
@@ -127,7 +127,7 @@ void Occ_ov_text(struct OSC_PICTURE *pPic, int x, int y, int size, char *text, u
 	}
 }
 
-void Occ_ov_line(struct OSC_PICTURE *pPic, int x1, int y1, int x2, int y2, uint32 col) 
+void ov_line(struct OSC_PICTURE *pPic, int x1, int y1, int x2, int y2, uint32 col) 
 {
 	INIT(pPic);
 	int16 x, y, dx, dy;
@@ -167,7 +167,7 @@ void Occ_ov_line(struct OSC_PICTURE *pPic, int x1, int y1, int x2, int y2, uint3
 	}
 }
 
-void Occ_ov_box(struct OSC_PICTURE *pPic, int x1, int y1, int x2, int y2, uint32 col, bool fill)
+void ov_box(struct OSC_PICTURE *pPic, int x1, int y1, int x2, int y2, uint32 col, bool fill)
 {
 	int y;
 	int tmp;
@@ -178,16 +178,16 @@ void Occ_ov_box(struct OSC_PICTURE *pPic, int x1, int y1, int x2, int y2, uint32
 			tmp=y1; y1=y2; y2=tmp;
 		}
 		for (y=y1; y<=y2; y++)
-			Occ_ov_line(pPic, x1, y, x2, y, col);
+			ov_line(pPic, x1, y, x2, y, col);
 	} else {
-		Occ_ov_line(pPic, x1, y1, x2, y1, col);
-		Occ_ov_line(pPic, x1, y1, x1, y2, col);
-		Occ_ov_line(pPic, x2, y1, x2, y2, col);
-		Occ_ov_line(pPic, x1, y2, x2, y2, col);
+		ov_line(pPic, x1, y1, x2, y1, col);
+		ov_line(pPic, x1, y1, x1, y2, col);
+		ov_line(pPic, x2, y1, x2, y2, col);
+		ov_line(pPic, x1, y2, x2, y2, col);
 	}
 }
 
-void Occ_ov_ellipse(struct OSC_PICTURE *pPic, int x1, int y1, int x2, int y2, uint32 col, bool fill)
+void ov_ellipse(struct OSC_PICTURE *pPic, int x1, int y1, int x2, int y2, uint32 col, bool fill)
 {
 	int tmp;
 	uint8 phi;
@@ -216,17 +216,17 @@ void Occ_ov_ellipse(struct OSC_PICTURE *pPic, int x1, int y1, int x2, int y2, ui
 		y1a = y0+c;
 		y2a = y0-c;
 		if (phi != 0) {
-			Occ_ov_line(pPic, ox1a, oy1a, x1a, y1a, col);
-			Occ_ov_line(pPic, ox2a, oy1a, x2a, y1a, col);
-			Occ_ov_line(pPic, ox1a, oy2a, x1a, y2a, col);
-			Occ_ov_line(pPic, ox2a, oy2a, x2a, y2a, col);
+			ov_line(pPic, ox1a, oy1a, x1a, y1a, col);
+			ov_line(pPic, ox2a, oy1a, x2a, y1a, col);
+			ov_line(pPic, ox1a, oy2a, x1a, y2a, col);
+			ov_line(pPic, ox2a, oy2a, x2a, y2a, col);
 		}
 		if ((phi != 0) && fill) {
 			for (y=oy2a; y<=y2a; y++) {
-				Occ_ov_line(pPic, ox1a, y, ox2a, y, col);
+				ov_line(pPic, ox1a, y, ox2a, y, col);
 			}
 			for (y=y1a; y<=oy1a; y++) {
-				Occ_ov_line(pPic, ox1a, y, ox2a, y, col);
+				ov_line(pPic, ox1a, y, ox2a, y, col);
 			}
 		}
 		ox1a = x1a; 
@@ -236,22 +236,22 @@ void Occ_ov_ellipse(struct OSC_PICTURE *pPic, int x1, int y1, int x2, int y2, ui
 	}
 }	
 
-void Occ_ov_pixel(struct OSC_PICTURE *pPic, int x, int y, uint32 col)
+void ov_pixel(struct OSC_PICTURE *pPic, int x, int y, uint32 col)
 {
 	INIT(pPic);
 	SETPIX(x, y, col)		
 }
 
-void Occ_ov_plot_vector(struct OSC_PICTURE *pic, int x0, int y0, int8 *v, int len, uint32 col)
+void ov_plot_vector(struct OSC_PICTURE *pic, int x0, int y0, int8 *v, int len, uint32 col)
 {
 	int i;
 	for (i=1; i<len; i++)  {
-		Occ_ov_line(pic, x0+i-1, y0+v[i-1], x0+i, y0+v[i], col);
+		ov_line(pic, x0+i-1, y0+v[i-1], x0+i, y0+v[i], col);
 	}
-	Occ_ov_line(pic, x0, y0, x0+len, y0, col);
+	ov_line(pic, x0, y0, x0+len, y0, col);
 }
 
-void Occ_ov_plot_vector_scale8(struct OSC_PICTURE *pic, int x1, int y1, int height, int8 *vect, int16 len, uint32 color) 
+void ov_plot_vector_scale8(struct OSC_PICTURE *pic, int x1, int y1, int height, int8 *vect, int16 len, uint32 color) 
 {
 	int8 v[len];
 	int x;
@@ -274,10 +274,10 @@ void Occ_ov_plot_vector_scale8(struct OSC_PICTURE *pic, int x1, int y1, int heig
 	for (x=0; x<len; x++)
 		v[x] = vect[x]*scale;
 
-	Occ_ov_plot_vector(pic, x1, y1+height/2, v, len, color);
+	ov_plot_vector(pic, x1, y1+height/2, v, len, color);
 }
 
-void Occ_ov_plot_vector_scale16(struct OSC_PICTURE *pic, int x1, int y1, int height, int16 *vect, int16 len, uint32 color) 
+void ov_plot_vector_scale16(struct OSC_PICTURE *pic, int x1, int y1, int height, int16 *vect, int16 len, uint32 color) 
 {
 	int8 v[len];
 	int x;
@@ -300,10 +300,10 @@ void Occ_ov_plot_vector_scale16(struct OSC_PICTURE *pic, int x1, int y1, int hei
 	for (x=0; x<len; x++)
 		v[x] = vect[x]*scale;
 
-	Occ_ov_plot_vector(pic, x1, y1+height/2, v, len, color);
+	ov_plot_vector(pic, x1, y1+height/2, v, len, color);
 }
 
-void Occ_ov_plot_vector_scale32(struct OSC_PICTURE *pic, int x1, int y1, int height, int32 *vect, int16 len, uint32 color) 
+void ov_plot_vector_scale32(struct OSC_PICTURE *pic, int x1, int y1, int height, int32 *vect, int16 len, uint32 color) 
 {
 	int8 v[len];
 	int x;
@@ -326,10 +326,10 @@ void Occ_ov_plot_vector_scale32(struct OSC_PICTURE *pic, int x1, int y1, int hei
 	for (x=0; x<len; x++)
 		v[x] = vect[x]*scale;
 
-	Occ_ov_plot_vector(pic, x1, y1+height/2, v, len, color);
+	ov_plot_vector(pic, x1, y1+height/2, v, len, color);
 }
 
-void Occ_ov_bar_vert(struct OSC_PICTURE *pic, int x1, int y1, int x2, int y2, int percentage, uint32 color) 
+void ov_bar_vert(struct OSC_PICTURE *pic, int x1, int y1, int x2, int y2, int percentage, uint32 color) 
 {
 	int height, tmp;
 
@@ -346,7 +346,7 @@ void Occ_ov_bar_vert(struct OSC_PICTURE *pic, int x1, int y1, int x2, int y2, in
 		percentage = 0;
 	height = (y2-y1)*percentage/100;
 	
-	Occ_ov_box(pic, x1, y2-height, x2, y2, color, true);
-	Occ_ov_box(pic, x1, y1, x2, y2, color, false);
+	ov_box(pic, x1, y2-height, x2, y2, color, true);
+	ov_box(pic, x1, y1, x2, y2, color, false);
 }
 

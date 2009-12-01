@@ -1,4 +1,4 @@
-# Makefile for simple modules in the Oscar Framework.
+# Makefile for simple blobs in the Oscar Code Collection
 # Copyright (C) 2008 Supercomputing Systems AG
 # 
 # This library is free software; you can redistribute it and/or modify it under
@@ -23,7 +23,7 @@ SHELL := $(shell which bash) -e -o pipefail
 ROOT_PATH := $(dir $(shell readlink $(lastword $(MAKEFILE_LIST))))
 
 # Generic flags for the C compiler.
-CFLAGS := -c -std=gnu99 -Wall $(if $(ROOT_PATH), -I$(ROOT_PATH)include) $(if $(ROOT_PATH), -I$(ROOT_PATH)oscar)
+CFLAGS := -c -std=gnu99 -Wall -I include $(if $(ROOT_PATH), -I$(ROOT_PATH)include) $(if $(ROOT_PATH), -I$(ROOT_PATH)oscar)
 
 # Host-Compiler executables and flags.
 CC_host_ := gcc $(CFLAGS) -fgnu89-inline -DOSC_HOST
@@ -39,6 +39,12 @@ CC_target_dbg := $(CC_target_) -ggdb3
 AS_host := as
 AS_target := bfin-uclinux-as
 
+# Executable to create the static library
+AR_host := ar -rcs
+AR_target := bfin-uclinux-ar -rcs
+
+MODULE := $(shell basename $(shell pwd))
+
 # Listings of source files for the different modes.
 SOURCES := $(filter-out %_host.c %_target.c, $(wildcard *.c))
 SOURCES_host := $(SOURCES) $(wildcard *_host.c)
@@ -50,7 +56,7 @@ MODES += $(addsuffix _dbg, $(MODES))
 
 # Helper function to access stacked, mode-dependent variables.
 varnames = $(filter $(.VARIABLES), $(foreach i, $(shell seq 1 $(words $(subst _, , $(1)))), $(subst $() ,_,$(wordlist 1, $i, $(subst _, , $(1))))))
-firstvar = $($(lastword $(call varnames, $(1))))
+firstvar = $($(lastword $(call varnames, $(1))))$(shell find . -type f -name '*_$$@.a' -exec ln -s ../{} library/`dirname {}` \;)
 allvars = $(foreach i, $(call varnames, $(1)), $($i))
 
 .PHONY: all $(MODES) clean
@@ -61,7 +67,10 @@ all: $(MODES)
 
 #Defining and expanding the build targets.
 define build_rules
-$(1): $(patsubst %.c, build/%_$(1).o, $(patsubst %.asm, build/%_$(1).o, $(call firstvar, SOURCES_$(1))))
+$(1): library/libosc-cc_$(MODULE)_$(1).a
+library/libosc-cc_$(MODULE)_$(1).a: $(patsubst %.c, build/%_$(1).o, $(patsubst %.asm, build/%_$(1).o, $(call firstvar, SOURCES_$(1))))
+	@mkdir -p library
+	$(call firstvar, AR_$(1)) $$@ build/*_$(1).o
 build/%_$(1).o: %.c $(filter-out %.d, $(MAKEFILE_LIST))
 	@ mkdir -p $$(dir $$@)
 	$$(call firstvar, CC_$(1)) -MD $$< -o $$@
@@ -72,6 +81,9 @@ build/%_$(1).o: %.asm $(filter-out %.d, $(MAKEFILE_LIST))
 endef
 $(foreach i, $(MODES), $(eval $(call build_rules,$(i))))
 
+$(MODES): %: library/libosc-cc_$(MODULE)_%.a
+
 # Cleans the module.
 clean:
 	rm -rf build
+	rm -rf library

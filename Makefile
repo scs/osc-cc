@@ -53,24 +53,21 @@ ifeq '$(CONFIG_PRIVATE_FRAMEWORK)' 'n'
 	@ ! [ -e "oscar" ] || [ -h "oscar" ] && ln -sfn $(CONFIG_FRAMEWORK_PATH) oscar
 endif
 	@ ! [ -d "oscar" ] || $(MAKE) -C oscar config
-	
-# Targets to build in a specific build mode and create the library.
-$(MODES): %: library/libosc-cc_%.a .FORCE;
-library/libosc-cc_%.a: osc-cc_% $(addsuffix /%, $(MODULES))
-	$(call firstvar, AR_$*) $@ $(addsuffix /build/*_$*.o, $(MODULES))
+
+# Targets to build in a specific build mode and create the libraries.
+$(MODES): %: .FORCE $(addsuffix /%, $(MODULES))
 
 # Allow a module to be given on the command line to build that module.
 $(MODULES): .FORCE
 	$(MAKE) -C $@
-
-# Call this as osc-cc_$(MODE) to only build the main osc-cc files.
-osc-cc_%: .FORCE
-	$(MAKE) -f Makefile_module $*
+	@find $@ -type f -name '*.a' -exec ln -f -s ../{} library/`dirname {}` \;
 
 # Produce a target of the form "foo/%" for every directory foo that contains a Makefile
 define subdir_target
 $(1)/%: .FORCE
 	$(MAKE) -C $(1) $$*
+	@find $(1) -type f -name '*_$$*.a' -exec ln -f -s ../{} library/`dirname {}` \;
+
 endef
 SUBDIRS := $(sort $(patsubst %/, %, $(dir $(wildcard */Makefile))) $(MODULES))
 $(foreach i, $(SUBDIRS), $(eval $(call subdir_target, $(i))))
@@ -78,12 +75,8 @@ $(foreach i, $(SUBDIRS), $(eval $(call subdir_target, $(i))))
 # Do not try to rebuild any of the Makefiles.
 $(sort $(MAKEFILE_LIST)):;
 
-# Routing individual object file requests directly to the compile Makefile
-%.o: .FORCE
-	$(MAKE) -f Makefile_module $@
-
 # Cleans the framework and all modules
-clean: %: $(addsuffix /%, $(MODULES)) osc-cc_clean .FORCE
+clean: %: $(addsuffix /%, $(MODULES)) .FORCE
 	rm -rf library/*.a
 
 # Cleans everything not intended for source distribution
