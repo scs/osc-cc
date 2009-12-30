@@ -1,6 +1,7 @@
 # Ignore generated files
 *~
 build
+*.[aod]
 
 # Ignore files used by the build system
 /oscar

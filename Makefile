@@ -48,6 +48,10 @@ allvars = $(foreach i, $(call varnames, $(1)), $($i))
 # Default target which builds all modules for the selected board configuration.
 all: $(MODES) .FORCE;
 
+# Target to explicitly start the configuration process.
+config: .FORCE
+	@ ./configure
+
 reconfigure:
 ifeq '$(CONFIG_PRIVATE_FRAMEWORK)' 'n'
 	@ ! [ -e "oscar" ] || [ -h "oscar" ] && ln -sfn $(CONFIG_FRAMEWORK_PATH) oscar
