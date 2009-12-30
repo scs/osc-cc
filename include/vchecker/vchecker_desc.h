@@ -26,7 +26,7 @@
 #ifndef DESCR_H
 #define DESCR_H
 
-#include <vchecker_global.h>
+#include "vchecker_global.h"
 
 /* Struktur um Deskriptoren Werte zu speichern */
 struct G_DESCRIPTOR {

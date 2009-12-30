@@ -27,7 +27,7 @@
 #ifndef REGION_LABELING_H
 #define REGION_LABELING_H
 
-#include <vchecker_global.h>
+#include "vchecker_global.h"
 
 /* Definitionen */
 #define RL_MAX_COLLISION_VECTOR_LEN     512 /* maximale Laenge des Kollisionsvektors */
