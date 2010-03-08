@@ -1,0 +1,6 @@
+# Ignore generated files
+*~
+build/
+*.[aod]
+library/
+
