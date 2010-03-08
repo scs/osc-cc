@@ -28,9 +28,9 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include <vchecker/vchecker_desc.h>
+#include <vchecker_desc.h>
 /* Depends on vchecker_labeling. */
-#include <vchecker/vchecker_labeling.h>
+#include <vchecker_labeling.h>
 
 
 #define FFT_SIZE                    512

@@ -25,7 +25,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <oscar.h>
-#include "leanXoverlay/leanXoverlay.h"
+#include "leanXoverlay.h"
 
 ov_font_t OV_FONT_SYSTEM = { NULL, "Font_System.bmp", 6, 12, 32, 127 };
 

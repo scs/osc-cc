@@ -1,4 +1,4 @@
-CONFIGS='PRIVATE_FRAMEWORK FRAMEWORK_PATH'
+CONFIGS='PRIVATE_FRAMEWORK FRAMEWORK_PATH MODULES'
 
 CONFIG_PRIVATE_FRAMEWORK() {
 	enabled() { true; }
@@ -14,6 +14,15 @@ CONFIG_FRAMEWORK_PATH() {
 	prompt() { echo 'Enter the path to the Oscar Framework.'; }
 	default() { echo '../oscar'; }
 	check() { grep -xqE '.+'; }
+	
+	[ "$1" ] && "$1"
+}
+
+CONFIG_MODULES() {
+	enabled() { true; }
+	prompt() { echo "Do you want to use the module $module? (y/n)"; }
+	default() { echo 'y'; }
+	check() { grep -xqE 'y|n'; }
 	
 	[ "$1" ] && "$1"
 }

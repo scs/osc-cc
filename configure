@@ -80,42 +80,69 @@ done
 for i_name in $CONFIGS; do
 	NAME="CONFIG_$i_name"
 	
-	{
-		VALUE_CLI=$(variable_read "$NAME")
-		VALUE_FILE=$(get_config "$CONF_FILE" "$NAME")
-		VALUE_DEFAULT=$("$NAME" default)
-	} > /dev/null
-	
-	# Check if we should ask for the configuration.
-	if "$NAME" enabled; then
-		# Check if the configuration value has been given on the command line.
-		if [ "$VALUE_CLI" ]; then
-			VALUE_NEW=$VALUE_CLI
-		else
-			[ "$VALUE_FILE" ] && VALUE=$VALUE_FILE || VALUE=$VALUE_DEFAULT
-			PROMPT=$("$NAME" prompt)
+	if [ "$NAME" = "CONFIG_MODULES" ]; then
+		#special treatment for modules -> list all modules in ./modules/
+		
+		EN_MODULES=""
+		for module in `ls ./modules/ -1 2>/dev/null`; do
+			mod_dir="./modules/$module/"
+			if [ -d "$mod_dir" ] && [ -f "${mod_dir}Makefile" ]; then
 			
-			while true; do
-				VALUE_NEW=$(ask "$VALUE" "$PROMPT")
+				VALUE=$("$NAME" default) >/dev/null
 				
-				echo "$VALUE_NEW" | "$NAME" check && break
-				print "The configuration is not valid: $VALUE_NEW"
-			done
-			
-		fi > /dev/null
+				PROMPT=$("$NAME" prompt)
+				while true; do
+					VALUE_NEW=$(ask "$VALUE" "$PROMPT")
+					
+					echo "$VALUE_NEW" | "$NAME" check && break
+					print "The configuration is not valid: $VALUE_NEW"
+				done
+				if [ "$VALUE_NEW" == 'y' ]; then
+					EN_MODULES="$EN_MODULES $module"
+				fi
+			fi > /dev/null
+		done
 		
-		variable_write "$NAME" "$VALUE_NEW" > /dev/null
-		echo "$NAME = $VALUE_NEW"
+		echo "$NAME = $EN_MODULES"
 	else
-		if [ "$VALUE_CLI" ]; then
-			VALUE_NEW=$VALUE_CLI
-		elif [ "$VALUE_FILE" ]; then
-			VALUE_NEW=$VALUE_FILE
-		else
-			VALUE_NEW=
-		fi > /dev/null
+	
+		{
+			VALUE_CLI=$(variable_read "$NAME")
+			VALUE_FILE=$(get_config "$CONF_FILE" "$NAME")
+			VALUE_DEFAULT=$("$NAME" default)
+		} > /dev/null
+	
+		# Check if we should ask for the configuration.
+		if "$NAME" enabled; then
+			# Check if the configuration value has been given on the command line.
+			if [ "$VALUE_CLI" ]; then
+				VALUE_NEW=$VALUE_CLI
+			else
+				[ "$VALUE_FILE" ] && VALUE=$VALUE_FILE || VALUE=$VALUE_DEFAULT
+				PROMPT=$("$NAME" prompt)
+			
+				while true; do
+					VALUE_NEW=$(ask "$VALUE" "$PROMPT")
+				
+					echo "$VALUE_NEW" | "$NAME" check && break
+					print "The configuration is not valid: $VALUE_NEW"
+				done
+			
+			fi > /dev/null
 		
-		[ "$VALUE_NEW" ] && echo "#$NAME = $VALUE_NEW"
+			variable_write "$NAME" "$VALUE_NEW" > /dev/null
+			echo "$NAME = $VALUE_NEW"
+		else
+			if [ "$VALUE_CLI" ]; then
+				VALUE_NEW=$VALUE_CLI
+			elif [ "$VALUE_FILE" ]; then
+				VALUE_NEW=$VALUE_FILE
+			else
+				VALUE_NEW=
+			fi > /dev/null
+		
+			[ "$VALUE_NEW" ] && echo "#$NAME = $VALUE_NEW"
+		fi
 	fi
 done > "${CONF_FILE}~"
 
