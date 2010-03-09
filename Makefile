@@ -53,12 +53,6 @@ all: $(MODES) .FORCE;
 config: .FORCE
 	@ ./configure
 
-reconfigure:
-ifeq '$(CONFIG_PRIVATE_FRAMEWORK)' 'n'
-	@ ! [ -e "oscar" ] || [ -h "oscar" ] && ln -sfn $(CONFIG_FRAMEWORK_PATH) oscar
-endif
-	@ ! [ -d "oscar" ] || $(MAKE) -C oscar config
-
 # Targets to build in a specific build mode and create the libraries.
 $(MODES): %: .FORCE $(addsuffix /%, $(MODULES))
 
