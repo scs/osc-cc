@@ -19,11 +19,11 @@
 -include ../../.config
 
 ifeq '$(CONFIG_PRIVATE_FRAMEWORK)' 'y'
-CONFIG_FRAMEWORK_PATH := ../../oscar
+CONFIG_CC_FRAMEWORK_PATH := ../../oscar
 else
-IS_ABSOLUTE_PATH:=$(shell expr "$(CONFIG_FRAMEWORK_PATH)" : '/')
+IS_ABSOLUTE_PATH:=$(shell expr "$(CONFIG_CC_FRAMEWORK_PATH)" : '/')
 ifeq '$(IS_ABSOLUTE_PATH)' '0'
-CONFIG_FRAMEWORK_PATH := ../../$(CONFIG_FRAMEWORK_PATH)
+CONFIG_CC_FRAMEWORK_PATH := ../../$(CONFIG_CC_FRAMEWORK_PATH)
 endif
 endif
 
@@ -35,7 +35,7 @@ SHELL := $(shell which bash) -e -o pipefail
 ROOT_PATH := $(dir $(shell readlink $(lastword $(MAKEFILE_LIST))))
 
 # Generic flags for the C compiler.
-CFLAGS := -c -std=gnu99 -Wall -I include $(if $(ROOT_PATH), -I$(ROOT_PATH)include) -I$(CONFIG_FRAMEWORK_PATH)/include
+CFLAGS := -c -std=gnu99 -Wall -I include $(if $(ROOT_PATH), -I$(ROOT_PATH)include) -I$(CONFIG_CC_FRAMEWORK_PATH)/include
 
 # Host-Compiler executables and flags.
 CC_host_ := gcc $(CFLAGS) -fgnu89-inline -DOSC_HOST

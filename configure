@@ -81,7 +81,7 @@ done
 for i_name in $CONFIGS; do
 	NAME="CONFIG_$i_name"
 	
-	if [ "$NAME" = "CONFIG_MODULES" ]; then
+	if [ "$NAME" = "CONFIG_CC_MODULES" ]; then
 		#special treatment for modules -> list all modules in ./modules/
 		
 		EN_MODULES=""

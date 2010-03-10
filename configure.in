@@ -1,6 +1,9 @@
-CONFIGS='PRIVATE_FRAMEWORK FRAMEWORK_PATH MODULES'
 
-CONFIG_PRIVATE_FRAMEWORK() {
+#NOTE: use CC_ prefix for variables to make shure, there are no mixing ups with the oscar variables
+
+CONFIGS='CC_PRIVATE_FRAMEWORK CC_FRAMEWORK_PATH CC_MODULES'
+
+CONFIG_CC_PRIVATE_FRAMEWORK() {
 	enabled() { true; }
 	prompt() { echo 'Is the Oscar Framework already in the folder ./oscar? (y/n)'; }
 	default() { echo 'n'; }
@@ -9,8 +12,8 @@ CONFIG_PRIVATE_FRAMEWORK() {
 	[ "$1" ] && "$1"
 }
 
-CONFIG_FRAMEWORK_PATH() {
-	enabled() { [ "$CONFIG_PRIVATE_FRAMEWORK" == 'n' ]; }
+CONFIG_CC_FRAMEWORK_PATH() {
+	enabled() { [ "$CONFIG_CC_PRIVATE_FRAMEWORK" == 'n' ]; }
 	prompt() { echo 'Enter the path to the Oscar Framework.'; }
 	default() { echo '../oscar'; }
 	check() { grep -xqE '.+'; }
@@ -18,7 +21,7 @@ CONFIG_FRAMEWORK_PATH() {
 	[ "$1" ] && "$1"
 }
 
-CONFIG_MODULES() {
+CONFIG_CC_MODULES() {
 	enabled() { true; }
 	prompt() { echo "Do you want to use the module $module? (y/n)"; }
 	default() { echo 'y'; }
