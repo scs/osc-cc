@@ -35,7 +35,7 @@ SHELL := $(shell which bash) -e -o pipefail
 ROOT_PATH := $(dir $(shell readlink $(lastword $(MAKEFILE_LIST))))
 
 # Generic flags for the C compiler.
-CFLAGS := -c -std=gnu99 -Wall -I include $(if $(ROOT_PATH), -I$(ROOT_PATH)include) -I$(CONFIG_CC_FRAMEWORK_PATH)/include
+CFLAGS := -c -std=gnu99 -Wall -Wno-unused-function -Wno-unused-value -I include $(if $(ROOT_PATH), -I$(ROOT_PATH)include) -I$(CONFIG_CC_FRAMEWORK_PATH)/include
 
 # Host-Compiler executables and flags.
 CC_host_ := gcc $(CFLAGS) -fgnu89-inline -DOSC_HOST
