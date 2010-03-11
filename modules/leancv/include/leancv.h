@@ -35,25 +35,34 @@ extern "C" {
 #define SKIP_INT64_TYPEDEF
 #include <oscar.h>
 
+#define IPL_DEPTH_16FRACT IPL_DEPTH_16U
 
+#define LCV_WIDTH_ALIGN 4 /* to be compatible with OpenCV */
+#define LCV_IMG_ALIGN CV_MALLOC_ALIGN /* align created images. Default: 16 */
+
+
+
+/*! @brief outputs an error to stderr and quits the application */
 void lcvError(const char* fmt, ...);
 
 
-/* Creates IPL image (header and data) */
+/*! @brief Creates IPL image (header and data) */
 IplImage*  lcvCreateImage( CvSize size, int depth, int channels );
 
-
-/* Allocates and initializes IplImage header */
+/*! @brief Allocates and initializes IplImage header */
 IplImage*  lcvCreateImageHeader( CvSize size, int depth, int channels );
 
-/* Releases IPL image header and data */
+/*! @brief Align an image to LCV_IMG_ALIGN */
+char* lcvAlignImage(char* img);
+
+/*! @brief Releases IPL image header and data */
 void  lcvReleaseImage( IplImage** image );
 
-/* Releases (i.e. deallocates) IPL image header */
+/*! @brief Releases (i.e. deallocates) IPL image header */
 void  lcvReleaseImageHeader( IplImage** image );
 
 
-/* Calculates an image derivative using generalized Sobel
+/*! @brief Calculates an image derivative using generalized Sobel
    (aperture_size = 1,3,5,7) or Scharr (aperture_size = -1) operator.
    Scharr can be used only for the first dx or dy derivative */
 void lcvSobel( const CvArr* src, CvArr* dst,
