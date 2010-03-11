@@ -34,6 +34,7 @@ extern "C" {
 
 #define SKIP_INT64_TYPEDEF
 #include <oscar.h>
+#include <cam.h>
 
 #define IPL_DEPTH_16FRACT IPL_DEPTH_16U
 
@@ -44,6 +45,11 @@ extern "C" {
 
 /*! @brief outputs an error to stderr and quits the application */
 void lcvError(const char* fmt, ...);
+
+
+//---------------------------------------------------------------------------
+///  Image Allocation & Deallocation
+//---------------------------------------------------------------------------
 
 
 /*! @brief Creates IPL image (header and data) */
@@ -61,6 +67,42 @@ void  lcvReleaseImage( IplImage** image );
 /*! @brief Releases (i.e. deallocates) IPL image header */
 void  lcvReleaseImageHeader( IplImage** image );
 
+
+
+//---------------------------------------------------------------------------
+///  Debayering
+//---------------------------------------------------------------------------
+
+/*! @brief Debayer a captured image to rgb color 
+ * the output format is BGR
+ */
+void lcvDebayer(const IplImage* raw_img, enum EnBayerOrder order, IplImage* output);
+
+/*! @brief Debayer a captured image (captured with a color sensor) to gray color 
+ *  the output image must have half the width & height of the input image
+ */
+void lcvDebayerGray(const IplImage* raw_img, enum EnBayerOrder order, IplImage* output);
+
+
+//---------------------------------------------------------------------------
+///  Image Formats
+//---------------------------------------------------------------------------
+
+
+
+
+//---------------------------------------------------------------------------
+///  Image Scaling & Conversion
+//---------------------------------------------------------------------------
+
+//fract16 <-> uint8
+
+
+
+
+//---------------------------------------------------------------------------
+///  Filters
+//---------------------------------------------------------------------------
 
 /*! @brief Calculates an image derivative using generalized Sobel
    (aperture_size = 1,3,5,7) or Scharr (aperture_size = -1) operator.
