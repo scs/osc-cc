@@ -35,6 +35,10 @@ extern "C" {
 #define SKIP_INT64_TYPEDEF
 #include <oscar.h>
 
+
+void lcvError(const char* fmt, ...);
+
+
 /* Creates IPL image (header and data) */
 IplImage*  lcvCreateImage( CvSize size, int depth, int channels );
 
@@ -44,6 +48,9 @@ IplImage*  lcvCreateImageHeader( CvSize size, int depth, int channels );
 
 /* Releases IPL image header and data */
 void  lcvReleaseImage( IplImage** image );
+
+/* Releases (i.e. deallocates) IPL image header */
+void  lcvReleaseImageHeader( IplImage** image );
 
 
 /* Calculates an image derivative using generalized Sobel
