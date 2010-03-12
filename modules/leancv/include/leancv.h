@@ -20,17 +20,31 @@
 /*! @file
  * @brief API definition for LeanCV Library
  * 
+ * 
+ * 
+ * Supported Image Formats/Image Conditions:
+ * ----------------------------------------
+ * 
+ * depth: 		IPL_DEPTH_8U
+ * 				IPL_DEPTH_16FRACT
+ * 
+ * width: 		multiple of LCV_WIDTH_ALIGN
+ * 
+ * channels:	1 or 3 (not all functions support 3 channels)
+ * 
+ * 
  */
 
 #ifndef LEANCV_INCLUDE_LEANCV_H_
 #define LEANCV_INCLUDE_LEANCV_H_
 
 #ifdef __cplusplus
-extern "C" {
+#include <iostream>
+#include <string>
 #endif
 
 /* include the opencv header for image type */
-#include <opencv/cv.h>
+#include <opencv/cxtypes.h>
 
 #define SKIP_INT64_TYPEDEF
 #include <oscar.h>
@@ -39,12 +53,23 @@ extern "C" {
 #define IPL_DEPTH_16FRACT IPL_DEPTH_16U
 
 #define LCV_WIDTH_ALIGN 4 /* to be compatible with OpenCV */
-#define LCV_IMG_ALIGN CV_MALLOC_ALIGN /* align created images. Default: 16 */
+#define LCV_IMG_ALIGN 16 /* align created images. Default: CV_MALLOC_ALIGN=16 */
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+
+void lcvError_m(const char* func, const char* file, int line, const char* fmt, ...);
 
 /*! @brief outputs an error to stderr and quits the application */
-void lcvError(const char* fmt, ...);
+#ifdef __cplusplus
+#define lcvError(fmt, ...) lcvError_m(__FUNCTION__, __FILE__, __LINE__, fmt, ## __VA_ARGS__)
+#else
+#define lcvError(fmt, args ...) lcvError_m(__FUNCTION__, __FILE__, __LINE__, fmt, ## args)
+#endif
 
 
 //---------------------------------------------------------------------------
@@ -88,8 +113,19 @@ void lcvDebayerGray(const IplImage* raw_img, enum EnBayerOrder order, IplImage* 
 ///  Image Formats
 //---------------------------------------------------------------------------
 
+/*! @brief write a bmp image to a file */
+OSC_ERR lcvBmpWrite(const IplImage* img, const char* file_name);
 
 
+/*! @brief read a bmp image from a file. if channels == 3, image format is BGR
+ * @return: created image on success, NULL on error
+ */
+IplImage* lcvBmpRead(const char* file_name);
+
+/*! @brief Reverse the row order of an image. Used for bmp's because they are
+ *  stored upside down
+ */
+void lcvImgReverseRowOrder(IplImage* img);
 
 //---------------------------------------------------------------------------
 ///  Image Scaling & Conversion
@@ -112,12 +148,11 @@ void lcvSobel( const CvArr* src, CvArr* dst,
                     int aperture_size CV_DEFAULT(3));
 
 
-
-
-
 #ifdef __cplusplus
 }
 #endif
+
+
 
 #endif /* LEANCV_INCLUDE_LEANCV_H_ */
 
