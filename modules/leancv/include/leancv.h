@@ -38,10 +38,6 @@
 #ifndef LEANCV_INCLUDE_LEANCV_H_
 #define LEANCV_INCLUDE_LEANCV_H_
 
-#ifdef __cplusplus
-#include <iostream>
-#include <string>
-#endif
 
 /* include the opencv header for image type */
 #include <opencv/cxtypes.h>
@@ -70,6 +66,7 @@ void lcvError_m(const char* func, const char* file, int line, const char* fmt, .
 #else
 #define lcvError(fmt, args ...) lcvError_m(__FUNCTION__, __FILE__, __LINE__, fmt, ## args)
 #endif
+
 
 
 //---------------------------------------------------------------------------
@@ -109,6 +106,7 @@ void lcvDebayer(const IplImage* raw_img, enum EnBayerOrder order, IplImage* outp
 void lcvDebayerGray(const IplImage* raw_img, enum EnBayerOrder order, IplImage* output);
 
 
+
 //---------------------------------------------------------------------------
 ///  Image Formats
 //---------------------------------------------------------------------------
@@ -116,6 +114,13 @@ void lcvDebayerGray(const IplImage* raw_img, enum EnBayerOrder order, IplImage* 
 /*! @brief write a bmp image to a file */
 OSC_ERR lcvBmpWrite(const IplImage* img, const char* file_name);
 
+
+/*! @brief get a bmp header.
+ *  @param img			pointer to the image
+ *  @param header_out	will point to the header on success
+ *  @return 			size of the header, < 0 on error
+  */
+int lcvBmpHeader(const IplImage* img, char** header_out);
 
 /*! @brief read a bmp image from a file. if channels == 3, image format is BGR
  * @return: created image on success, NULL on error
@@ -127,11 +132,15 @@ IplImage* lcvBmpRead(const char* file_name);
  */
 void lcvImgReverseRowOrder(IplImage* img);
 
+
+
 //---------------------------------------------------------------------------
 ///  Image Scaling & Conversion
 //---------------------------------------------------------------------------
 
 //fract16 <-> uint8
+
+
 
 
 

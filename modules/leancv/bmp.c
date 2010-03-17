@@ -71,23 +71,37 @@ static inline void lcvBmpReadHdrInfo(const uint8 *pHdr,
 #endif /* CPU_LITTLE_ENDIAN */
 }
 
-static inline void lcvBmpWriteHdrInfo(uint8 *pHdr,
-		const int32 width, const int32 height, const int16 colorDepth,
-		const int32 headerSize)
-{
-	int32           imageSize, dataOffset, fileSize;
+
+
+
+int lcvBmpHeader(const IplImage* img, char** header_out) {
 	
-	imageSize = (((int32)width*(colorDepth/8) + 3)/4)*4*height;
-	fileSize = imageSize + headerSize;
-	dataOffset = headerSize;
+	if(img->depth != IPL_DEPTH_8U || !img || !header_out) return(-EINVALID_PARAMETER);
+	
+	int header_size;
+	uint8* pHdr;
+	if(img->nChannels == 1) {
+		pHdr = aryBmpHeadGrey;
+		header_size = sizeof(aryBmpHeadGrey);
+	} else if(img->nChannels == 3) {
+		pHdr = aryBmpHeadRGB;
+		header_size = sizeof(aryBmpHeadRGB);
+	} else {
+		return(-EINVALID_PARAMETER);
+	}
+	
+	int16 colorDepth=(img->depth & ~IPL_DEPTH_SIGN)*img->nChannels;
+	int32 imageSize = (((int32)img->width*(colorDepth/8) + 3)/4)*4*img->height;
+	int32 fileSize = imageSize + header_size;
+	int32 dataOffset = header_size;
 	
 	/* BMP uses little endian format */
 #ifdef CPU_LITTLE_ENDIAN
 	/* Data is already lying correctly in memory */
 	ST_INT32(&pHdr[BMP_HEADER_FIELD_FILE_SIZE], fileSize);
 	ST_INT32(&pHdr[BMP_HEADER_FIELD_DATA_OFFSET], dataOffset);
-	ST_INT32(&pHdr[BMP_HEADER_FIELD_WIDTH], width);
-	ST_INT32(&pHdr[BMP_HEADER_FIELD_HEIGHT], height);
+	ST_INT32(&pHdr[BMP_HEADER_FIELD_WIDTH], img->width);
+	ST_INT32(&pHdr[BMP_HEADER_FIELD_HEIGHT], img->height);
 	ST_INT16(&pHdr[BMP_HEADER_FIELD_COLOR_DEPTH], colorDepth);
 	ST_INT32(&pHdr[BMP_HEADER_FIELD_IMAGE_SIZE], imageSize);
 #else /* CPU_LITTLE_ENDIAN */
@@ -97,56 +111,44 @@ static inline void lcvBmpWriteHdrInfo(uint8 *pHdr,
 	ST_INT32(&pHdr[BMP_HEADER_FIELD_DATA_OFFSET],
 			ENDIAN_SWAP_32(dataOffset));
 	ST_INT32(&pHdr[BMP_HEADER_FIELD_WIDTH],
-			ENDIAN_SWAP_32(width));
+			ENDIAN_SWAP_32(img->width));
 	ST_INT32(&pHdr[BMP_HEADER_FIELD_HEIGHT],
-			ENDIAN_SWAP_32(height));
+			ENDIAN_SWAP_32(img->height));
 	ST_INT16(&pHdr[BMP_HEADER_FIELD_COLOR_DEPTH],
 			ENDIAN_SWAP_16(colorDepth));
 	ST_INT32(&pHdr[BMP_HEADER_FIELD_IMAGE_SIZE],
 			ENDIAN_SWAP_32(imageSize));
 #endif /* CPU_LITTLE_ENDIAN */
+	
+	
+	*header_out=(char*)pHdr;
+	return(header_size);
 }
-
 
 
 OSC_ERR lcvBmpWrite(const IplImage* img, const char* file_name) {
 
-	FILE            *pPicFile;
-	int16           colorDepth;
-	uint8           *aryBmpHead;
-	uint32          bmpHeadSize;
-	uint32          zero = 0;
-	int32          row, rowLen, padLen;
-	uint8           *pData;
-	
 	/* Input validation */
 	if(img == NULL || img->imageData == NULL ||
 			file_name == NULL || file_name[0] == '\0') {
 		lcvError("Invalid Parameter");
 	}
-	
 	if(img->depth != IPL_DEPTH_8U) lcvError("Image depth must be %i", IPL_DEPTH_8U);
 	
 	
-	if(img->nChannels == 1) {
-		aryBmpHead = aryBmpHeadGrey;
-		bmpHeadSize = sizeof(aryBmpHeadGrey);
-		colorDepth = 8;
-	} else if(img->nChannels == 3) {
-		aryBmpHead = aryBmpHeadRGB;
-		bmpHeadSize = sizeof(aryBmpHeadRGB);
-		colorDepth = 24;
-	} else {
-		lcvError("Image Channel count must be 1 or 3");
-	}
+	FILE            *pPicFile;
+	int16           colorDepth=(img->depth & ~IPL_DEPTH_SIGN)*img->nChannels;
+	uint8           *aryBmpHead;
+	int             bmpHeadSize;
+	uint32          zero = 0;
+	int32           row, rowLen, padLen;
+	uint8           *pData;
 	
-			
-	/* Initialize the header */
-	lcvBmpWriteHdrInfo(aryBmpHead,
-			(int32)img->width,
-			(int32)img->height,
-			colorDepth,
-			bmpHeadSize);
+	
+	bmpHeadSize=lcvBmpHeader(img, (char**)&aryBmpHead);
+	
+	if(bmpHeadSize < 0) lcvError("Invalid Parameter");
+	
 	
 	pPicFile = fopen(file_name, "wb");
 	if(pPicFile == NULL) {
