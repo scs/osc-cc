@@ -29,6 +29,10 @@
 
 #include "vchecker_global.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Definitionen */
 #define RL_MAX_COLLISION_VECTOR_LEN     512 /* maximale Laenge des Kollisionsvektors */
 
@@ -47,5 +51,9 @@
  * Rueckgabewerte:  die gefundenen Boundingboxen werden in bb gespeichert
  ******************************************************************************/
 void regionLabeling(uint8 *pBw, uint32 width, uint32 height, struct G_BOUNDINGBOX *bb);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif 

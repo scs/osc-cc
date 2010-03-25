@@ -55,7 +55,7 @@ bool  init_done = false;
 		_x2  = _tmp; \
 	} o
 
-int Occ_ov_init() {
+int ov_init() {
 	ov_font_t *f = &OV_FONT_SYSTEM;
 	uint16 i;
 	OSC_ERR err;
@@ -95,7 +95,7 @@ void blob(struct OSC_PICTURE *pPic, int x, int y, int size, uint32 color)
 	}
 }
 
-void ov_text(struct OSC_PICTURE *pPic, int x, int y, int size, char *text, uint32 col_fg, uint32 col_bg) 
+void ov_text(struct OSC_PICTURE *pPic, int x, int y, int size, const char *text, uint32 col_fg, uint32 col_bg) 
 {
 	int i;
 	int a,b;
@@ -103,6 +103,8 @@ void ov_text(struct OSC_PICTURE *pPic, int x, int y, int size, char *text, uint3
 	uint8 pix;
 	ov_font_t *f = &OV_FONT_SYSTEM;
 	uint8 *f_data;
+	bool bg_trans=col_bg & 0xff000000;
+	bool fg_trans=col_fg & 0xff000000;
 	
 	
 	f_data=f->p->data;
@@ -117,10 +119,11 @@ void ov_text(struct OSC_PICTURE *pPic, int x, int y, int size, char *text, uint3
 		for (a=0; a<f->width; a++) {
 			for (b=0; b<f->height; b++) {
 				pix = f_data[b*f->p->width+num*f->width+a];
-				if (pix)
-					blob(pPic, x+a*size, y+b*size, size, col_fg);
-				else
-					blob(pPic, x+a*size, y+b*size, size, col_bg);
+				if (pix) {
+					if(!fg_trans) blob(pPic, x+a*size, y+b*size, size, col_fg);
+				} else {
+					if(!bg_trans) blob(pPic, x+a*size, y+b*size, size, col_bg);
+				}
 			}
 		}
 		x = x + f->width*size;

@@ -28,6 +28,10 @@
 
 #include "vchecker_global.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Struktur um Deskriptoren Werte zu speichern */
 struct G_DESCRIPTOR {
     /* Flaeche des Objekts*/
@@ -147,5 +151,10 @@ void numberOfHoles(uint8 *pBw, uint32 width, uint32 height, struct G_DESCRIPTOR 
  * Rueckgabewerte:  descr->meanDistance2BP  mittlerer Abstand zum Schwerpunkt
  ******************************************************************************/
 void meanDistance2BalancePoint(uint8 *pBw, uint32 width, uint32 height, struct G_DESCRIPTOR *descr, struct G_BOUNDINGBOX *bb);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif 
  

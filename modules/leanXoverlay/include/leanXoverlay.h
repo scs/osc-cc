@@ -22,6 +22,12 @@
 #ifndef H_LEANXOVERLAY
 #define H_LEANXOVERLAY
 
+#include <oscar.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct {
 	struct OSC_PICTURE *p;
 	char *filename;
@@ -33,7 +39,7 @@ typedef struct {
 
 	
 int ov_init();
-void ov_text(struct OSC_PICTURE *pPic, int x, int y, int size, char *text, uint32 col_fg, uint32 col_bg);
+void ov_text(struct OSC_PICTURE *pPic, int x, int y, int size, const char *text, uint32 col_fg, uint32 col_bg);
 void ov_line(struct OSC_PICTURE *pPic, int x1, int y1, int x2, int y2, uint32 col);
 void ov_box(struct OSC_PICTURE *pPic, int x1, int y1, int x2, int y2, uint32 col, bool fill);
 void ov_bar_vert(struct OSC_PICTURE *pic, int x1, int y1, int x2, int y2, int percentage, uint32 color); 
@@ -43,5 +49,9 @@ void ov_plot_vector(struct OSC_PICTURE *pic, int x0, int y0, int8 *v, int len, u
 void ov_plot_vector_scale8(struct OSC_PICTURE *pic, int x1, int y1, int height, int8 *vect, int16 len, uint32 color); 
 void ov_plot_vector_scale16(struct OSC_PICTURE *pic, int x1, int y1, int height, int16 *vect, int16 len, uint32 color); 
 void ov_plot_vector_scale32(struct OSC_PICTURE *pic, int x1, int y1, int height, int32 *vect, int16 len, uint32 color); 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
