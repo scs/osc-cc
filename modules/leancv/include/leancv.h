@@ -25,7 +25,7 @@
  * Supported Image Formats/Image Conditions:
  * ----------------------------------------
  * 
- * depth: 		IPL_DEPTH_8U
+ * depth:		IPL_DEPTH_8U
  * 				IPL_DEPTH_16FRACT
  * 
  * width: 		multiple of LCV_WIDTH_ALIGN
@@ -138,9 +138,11 @@ void lcvImgReverseRowOrder(IplImage* img);
 ///  Image Scaling & Conversion
 //---------------------------------------------------------------------------
 
-//fract16 <-> uint8
 
-
+/*! @brief Convert one image type to another.
+ *  	currently, IPL_DEPTH_16FRACT  <-> IPL_DEPTH_8U conversion is supported
+ */
+void lcvConvert(const IplImage* img_in, IplImage* img_out);
 
 
 
@@ -149,12 +151,6 @@ void lcvImgReverseRowOrder(IplImage* img);
 ///  Filters
 //---------------------------------------------------------------------------
 
-/*! @brief Calculates an image derivative using generalized Sobel
-   (aperture_size = 1,3,5,7) or Scharr (aperture_size = -1) operator.
-   Scharr can be used only for the first dx or dy derivative */
-void lcvSobel( const CvArr* src, CvArr* dst,
-                    int xorder, int yorder,
-                    int aperture_size CV_DEFAULT(3));
 
 
 #ifdef __cplusplus

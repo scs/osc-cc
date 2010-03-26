@@ -19,6 +19,8 @@
 
 #include <leancv.h>
 
+#include <dspl.h> //from oscar
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -107,6 +109,55 @@ void  lcvReleaseImageHeader( IplImage** image ) {
         
         free(img);
 	}
+}
+
+
+
+void lcvConvert(const IplImage* img_in, IplImage* img_out) {
+	
+	if(!img_in || !img_out) lcvError("Image parameter is NULL");
+	
+	if(img_in->width!=img_out->width || img_in->height!=img_out->height) 
+		lcvError("Image sizes must be the same");
+	
+	if(img_in->nChannels!=img_out->nChannels) lcvError("Channel count must be the same");
+	
+	fract16* data;
+	
+	switch(img_in->depth) {
+	case IPL_DEPTH_8U:
+		switch(img_out->depth) {
+		case IPL_DEPTH_16FRACT:
+			//IPL_DEPTH_8U -> IPL_DEPTH_16FRACT
+			data=(fract16*)img_out->imageData;
+			for(int i=0; i<img_in->imageSize; ++i) {
+				data[i]=(fract16)((uint32)img_in->imageData[i]*0xffff/255);
+			}
+			break;
+		default:
+			lcvError("Unsupported Image Depth");
+		}
+		break;
+		
+	case IPL_DEPTH_16FRACT:
+		switch(img_out->depth) {
+		case IPL_DEPTH_8U:
+			//IPL_DEPTH_16FRACT -> IPL_DEPTH_8U
+			data=(fract16*)img_in->imageData;
+			for(int i=0; i<img_out->imageSize; ++i) {
+				img_out->imageData[i]=(char)((uint32)data[i]*255/0xffff);
+			}
+			break;
+		default:
+			lcvError("Unsupported Image Depth");
+		}
+		break;
+		
+	default:
+		lcvError("Unsupported Image Depth");
+	}
+	
+	
 }
 
 
