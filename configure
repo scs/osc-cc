@@ -85,11 +85,23 @@ for i_name in $CONFIGS; do
 		#special treatment for modules -> list all modules in ./modules/
 		
 		EN_MODULES=""
+		VALUE_FILE=$(get_config "$CONF_FILE" "$NAME") >/dev/null
+		
 		for module in `ls ./modules/ -1 2>/dev/null`; do
 			mod_dir="./modules/$module/"
 			if [ -d "$mod_dir" ] && [ -f "${mod_dir}Makefile" ]; then
-			
+				
 				VALUE=$("$NAME" default) >/dev/null
+				
+				#check if value already set
+				if [ "$VALUE_FILE" != "" ]; then
+					if [ "`echo $VALUE_FILE | grep $module`" == "" ]; then
+						VALUE='n';
+					else
+						VALUE='y';
+					fi
+				fi
+				
 				
 				PROMPT=$("$NAME" prompt)
 				while true; do
