@@ -95,10 +95,14 @@ void  lcvReleaseImageHeader( IplImage** image );
 ///  Debayering
 //---------------------------------------------------------------------------
 
-/*! @brief Debayer a captured image to rgb color 
- * the output format is BGR
+/*! @brief Debayer a captured image to BGR color 
+ * the output format is BGR interleaved
+ * 
+ * @param pTmp 	Temporary memory for intermediate calculations
+ *  			(size: raw_img->width x 4)
  */
-void lcvDebayer(const IplImage* raw_img, enum EnBayerOrder order, IplImage* output);
+void lcvDebayerBilinear(const IplImage* raw_img, enum EnBayerOrder order
+		, uint8* pTmp, IplImage* output);
 
 /*! @brief Debayer a captured image (captured with a color sensor) to gray color 
  *  the output image must have half the width & height of the input image
