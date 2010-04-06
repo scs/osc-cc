@@ -113,7 +113,7 @@ void  lcvReleaseImageHeader( IplImage** image ) {
 
 
 
-void lcvConvert(const IplImage* img_in, IplImage* img_out) {
+void lcvConvertImage(const IplImage* img_in, IplImage* img_out) {
 	
 	if(!img_in || !img_out) lcvError("Image parameter is NULL");
 	
@@ -122,16 +122,16 @@ void lcvConvert(const IplImage* img_in, IplImage* img_out) {
 	
 	if(img_in->nChannels!=img_out->nChannels) lcvError("Channel count must be the same");
 	
-	fract16* data;
+	int16* data;
 	
 	switch(img_in->depth) {
 	case IPL_DEPTH_8U:
 		switch(img_out->depth) {
 		case IPL_DEPTH_16FRACT:
 			//IPL_DEPTH_8U -> IPL_DEPTH_16FRACT
-			data=(fract16*)img_out->imageData;
+			data=(int16*)img_out->imageData;
 			for(int i=0; i<img_in->imageSize; ++i) {
-				data[i]=(fract16)((uint32)img_in->imageData[i]*0xffff/255);
+				data[i]=(int16)((int16)(img_in->imageData[i])<<7)-0x7FFF;
 			}
 			break;
 		default:
@@ -145,7 +145,7 @@ void lcvConvert(const IplImage* img_in, IplImage* img_out) {
 			//IPL_DEPTH_16FRACT -> IPL_DEPTH_8U
 			data=(fract16*)img_in->imageData;
 			for(int i=0; i<img_out->imageSize; ++i) {
-				img_out->imageData[i]=(char)((uint32)data[i]*255/0xffff);
+				img_out->imageData[i]=(char)((data[i]>>8)-128);
 			}
 			break;
 		default:

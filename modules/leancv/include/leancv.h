@@ -46,7 +46,7 @@
 #include <oscar.h>
 #include <cam.h>
 
-#define IPL_DEPTH_16FRACT IPL_DEPTH_16U
+#define IPL_DEPTH_16FRACT IPL_DEPTH_16S
 
 #define LCV_WIDTH_ALIGN 4 /* to be compatible with OpenCV */
 #define LCV_IMG_ALIGN 16 /* align created images. Default: CV_MALLOC_ALIGN=16 */
@@ -142,7 +142,7 @@ void lcvImgReverseRowOrder(IplImage* img);
 /*! @brief Convert one image type to another.
  *  	currently, IPL_DEPTH_16FRACT  <-> IPL_DEPTH_8U conversion is supported
  */
-void lcvConvert(const IplImage* img_in, IplImage* img_out);
+void lcvConvertImage(const IplImage* img_in, IplImage* img_out);
 
 
 
