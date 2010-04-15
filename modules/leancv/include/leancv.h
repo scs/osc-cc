@@ -149,11 +149,102 @@ void lcvImgReverseRowOrder(IplImage* img);
 void lcvConvertImage(const IplImage* img_in, IplImage* img_out);
 
 
+/*! @brief Convert an image to a binary
+ *  	img_in can be the same as img_out
+ */
+void lcvConvertImageBinary(const IplImage* img_in, IplImage* img_out, int threshold);
 
 
 //---------------------------------------------------------------------------
-///  Filters
+///  Filters & Object detection
 //---------------------------------------------------------------------------
+
+
+#define MAX_RUN_COUNT 8192
+#define MAX_OBJECT_COUNT 1024
+
+/*! @brief Structure representing a run used in connected components labeling based on run-length-encoding (RLE). */
+struct LCV_REGIONS_RUN {
+	uint16 row;								/*!< @brief The row in which the run was detected */
+	uint16 startColumn;						/*!< @brief The start column of the detected run */
+	uint16 endColumn;						/*!< @brief The end column of the detected run */
+	struct LCV_REGIONS_RUN *parent;			/*!< @brief Pointer to the parent run */
+	struct LCV_REGIONS_RUN *next;			/*!< @brief Pointer to the next run in the linked list of runs */
+	uint16 label;							/*!< @brief Label number of the run */
+};
+
+/*! @brief Structure representing an object (=region) in the binary image. Used in connected components labeling based on run-length-encoding (RLE). */
+struct LCV_REGIONS_OBJECT {
+	struct LCV_REGIONS_RUN *root;			/*!< @brief Pointer to the root run representing the object */
+	uint16 area;							/*!< @brief Property entry for object area */
+	uint16 perimeter;						/*!< @brief Property entry for object perimter (not implemented yet) */
+	uint16 centroidX, centroidY;			/*!< @brief Property entry for object centroid pixel coordinates */
+	uint16 bboxTop, bboxBottom, bboxLeft, bboxRight; /*!< @brief Property entry for object bounding box coordinates */
+};
+
+/*! @brief Structure representing a binary image as connected sets of runs grouped into objects (=regions). It is the result/output
+ * of the connected components labeling algorithm based on run-length-encoding (RLE). */
+struct LCV_REGIONS {
+	uint16 noOfRuns;											/*!< @brief Number of detected runs */
+	uint16 noOfObjects;											/*!< @brief Number of detected objects/regions */
+	struct LCV_REGIONS_RUN runs[MAX_RUN_COUNT];					/*!< @brief The array of all detected runs */
+	struct LCV_REGIONS_OBJECT objects[MAX_OBJECT_COUNT];		/*!< @brief Array of the detected objects */
+};
+
+
+/*!
+ * @brief Label Binary Image
+ * 
+ * This function labels the binary image by checking for connected-components based on
+ * run-length encoding. This function outputs a representation of the binary image based on connected
+ * sets of runs. The sets of runs are refered to as 'objects' (=regions of foreground pixels).
+ * 
+ * @param img	pointer to the image
+ * @param regions Pointer to the regions struct
+ */
+void lcvLabelBinary(const IplImage* img_in, struct LCV_REGIONS* regions);
+
+/*!
+ * @brief Extract Properties of the Regions (=labeled binary Image)
+ * 
+ * This function fills out the internal properties data fields (area,
+ * centroid, bounding box) of the regions.
+ * 
+ * @param regions Pointer to the regions struct
+ */
+void lcvGetRegionProperties(struct LCV_REGIONS* regions);
+
+
+
+//---------------------------------------------------------------------------
+///  Drawing
+//---------------------------------------------------------------------------
+
+
+/*!
+ * @brief Draw Centroid Markers
+ * 
+ * This function draws the centroids of the Regions as small crosses. 
+ * 
+ * @param img_in Pointer to the input color picture struct.
+ * @param regions Pointer to the regions struct
+ * @param color drawing color. size must be img_in->nChannels * image depth
+ */
+void lcvDrawCentroidMarkers(IplImage* img_in
+		, const struct LCV_REGIONS *regions, const char* color);
+
+/*!
+ * @brief Draw Bounding Boxes
+ * 
+ * This function draws the bounding boxes of the Regions as rectangles. 
+ * 
+ * @param img_in Pointer to the input color picture struct.
+ * @param regions Pointer to the regions struct
+ * @param color drawing color. size must be img_in->nChannels * image depth
+ */
+void lcvDrawBoundingBox(IplImage* img_in
+		, const struct LCV_REGIONS *regions, const char* color);
+
 
 
 
