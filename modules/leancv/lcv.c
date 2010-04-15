@@ -156,11 +156,35 @@ void lcvConvertImage(const IplImage* img_in, IplImage* img_out) {
 	default:
 		lcvError("Unsupported Image Depth");
 	}
-	
-	
 }
 
 
+void lcvConvertImageBinary(const IplImage* img_in, IplImage* img_out, int threshold) {
+	
+	if(!img_in || !img_out) lcvError("Image parameter is NULL");
+	
+	if(img_in->width!=img_out->width || img_in->height!=img_out->height) 
+		lcvError("Image sizes must be the same");
+	
+	if(img_in->nChannels!=img_out->nChannels || img_in->nChannels!=1) 
+		lcvError("Channel count must be 1");
+	
+	char val;
+	fract16* ptr_in=(fract16*)img_in->imageData;
+	fract16* ptr_out=(fract16*)img_out->imageData;
+	for(int i=0; i<img_in->width*img_in->height; ++i) {
+		if(img_in->depth == IPL_DEPTH_8U) {
+			val=(uint8)((img_in->imageData[i]) < (uint8) threshold ? 0 : 1);
+		} else { //IPL_DEPTH_16FRACT
+			val=(ptr_in[i] < (fract16) threshold ? 0 : 1);
+		}
+		if(img_out->depth == IPL_DEPTH_8U) {
+			img_out->imageData[i]=(uint8)val;
+		} else { //IPL_DEPTH_16FRACT
+			ptr_out[i]=(fract16)val;
+		}
+	}
+}
 
 
 
