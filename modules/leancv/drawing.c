@@ -22,7 +22,7 @@
 void setPixel(IplImage* img, int x, int y, const char* color) {
 	memcpy(img->imageData + 
 		(img->depth & ~IPL_DEPTH_SIGN)/8*img->nChannels*(y*img->width+x), color
-		, (img->depth & ~IPL_DEPTH_SIGN)*img->nChannels);
+		, (img->depth & ~IPL_DEPTH_SIGN)/8*img->nChannels);
 }
 
 void lcvDrawCentroidMarkers(IplImage* img_in
