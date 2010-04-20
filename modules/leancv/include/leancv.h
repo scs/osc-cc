@@ -228,7 +228,7 @@ void lcvGetRegionProperties(struct LCV_REGIONS* regions);
  * 
  * @param img_in Pointer to the input color picture struct.
  * @param regions Pointer to the regions struct
- * @param color drawing color. size must be img_in->nChannels * image depth
+ * @param color drawing color. size must be img_in->nChannels * image depth/8
  */
 void lcvDrawCentroidMarkers(IplImage* img_in
 		, const struct LCV_REGIONS *regions, const char* color);
@@ -240,7 +240,7 @@ void lcvDrawCentroidMarkers(IplImage* img_in
  * 
  * @param img_in Pointer to the input color picture struct.
  * @param regions Pointer to the regions struct
- * @param color drawing color. size must be img_in->nChannels * image depth
+ * @param color drawing color. size must be img_in->nChannels * image depth/8
  */
 void lcvDrawBoundingBox(IplImage* img_in
 		, const struct LCV_REGIONS *regions, const char* color);
