@@ -1,0 +1,16 @@
++ Release v1.0
+
+leancv module:
++ openCV image type
++ debayering
++ bmp format
++ image type conversion
++ label binary
+
+leanXoverlay module:
++ draw objects
++ draw text
+
+vchecker module:
++ image labeling
++ image moments
